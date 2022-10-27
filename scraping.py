@@ -19,6 +19,7 @@ def scrape_all():
             "news_paragraph": news_paragraph,
             "featured_image": featured_image(browser),
             "facts": mars_facts(),
+            "hemisphere_data": hemisphere_data(browser),
             "last_modified": dt.datetime.now()
     }
     
@@ -65,13 +66,15 @@ def featured_image(browser):
     # visit url
     url = 'https://spaceimages-mars.com/'
     browser.visit(url)
-    html = browser.html
-    img_soup = soup(html, 'html.parser')
 
      # Find and click the full image button
     full_image_elem = browser.find_by_tag('button')[1]
 
     full_image_elem.click()
+
+    # Parse the resulting html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
 
     try:
         # Find the relative image url
@@ -109,9 +112,36 @@ def mars_facts():
     df.set_index('description', inplace=True)
 
     # Convert dataframe into HTML format, add bootstrap
-    return df.to_html(classes = "table table-striped")
+    # Deliverable 3 added bootstrap element table-hover to table
+    return df.to_html(classes = "table table-striped table-hover")
 
 
+def hemisphere_data(browser):
+
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+
+    browser.visit(url)
+    hemisphere_image_urls = []
+
+    for i in range(4):
+        try:
+
+            hemispheres = {}  
+
+            browser.find_by_css('h3')[i].click()
+            link_found = browser.links.find_by_text('Sample')
+            img_url = link_found['href']
+            title = browser.find_by_css('h2').text
+            hemispheres["img_url"] = img_url
+            hemispheres["title"] = title
+            hemisphere_image_urls.append(hemispheres)
+            browser.back() 
+
+        except BaseException:
+
+            return None
+    
+    return hemisphere_image_urls
 
 if __name__ == "__main__":
         

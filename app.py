@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Use flask_pymongo to set up mongo connection
 # tells Python that our app will connect to Mongo using a URI, a uniform resource identifier similar to a URL.
 app.config["MONGO_URI"] = "mongodb://localhost:27017/mars_app" # <--is the URI we'll be using to connect our app to Mongo
-
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 mongo = PyMongo(app)
 
